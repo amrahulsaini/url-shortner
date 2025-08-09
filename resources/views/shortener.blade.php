@@ -2,84 +2,149 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Shorter.ly - The Simple URL Shortener</title>
-    <!-- We still use Bootstrap, but we will override it with our own styles -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuickLink | The Ultimate URL Shortener</title>
+    
+    <!-- Using a modern CSS Reset and Bootstrap for the grid system -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     
-    <!-- 1. Import a professional font from Google Fonts -->
+    <!-- Professional Google Font: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
 
     <style>
-        /* 2. A beautiful animated gradient background and modern font */
+        /* A more robust CSS setup */
+        :root {
+            --primary-color: #0d6efd; /* Bootstrap Blue */
+            --background-color: #f8f9fa;
+            --text-color: #212529;
+            --light-text-color: #6c757d;
+            --border-radius: 0.75rem;
+            --box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        html, body {
+            height: 100%;
+        }
+
         body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
-            height: 100vh;
-            display: flex; /* These 3 lines vertically center the card */
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            display: flex;
             align-items: center;
             justify-content: center;
+            padding: 1rem;
+            animation: fadeInPage 1s ease-out;
         }
 
-        /* Keyframes for the background animation */
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        @keyframes fadeInPage {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
-        /* 3. The "floating" card with a fade-in animation */
-        .card {
-            border: none;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            animation: fadeIn 1s ease-in-out;
+        .main-container {
+            width: 100%;
+            max-width: 650px;
+            text-align: center;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
+        .hero-section h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
         }
 
-        .card-header h1 {
-            font-weight: 700; /* Bolder title */
+        .hero-section p {
+            font-size: 1.15rem;
+            color: var(--light-text-color);
+            margin-bottom: 2.5rem;
         }
-        
-        /* 4. Better looking form elements */
+
+        .form-card {
+            background: #ffffff;
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+
         .form-control {
-            height: 50px;
-            border-radius: 10px;
+            height: 55px;
+            font-size: 1rem;
+            border-radius: var(--border-radius);
+            border: 1px solid #ced4da;
         }
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        }
+
         .btn-primary {
-            height: 50px;
-            border-radius: 10px;
+            height: 55px;
+            font-size: 1rem;
             font-weight: 500;
-            transition: all 0.2s ease; /* Smooth transition for hover effects */
+            border-radius: var(--border-radius);
+            transition: background-color 0.2s ease, transform 0.2s ease;
         }
-
-        /* 5. A satisfying button hover effect */
         .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+            transform: scale(1.02);
         }
 
-        /* 6. A slide-in animation for the success message */
         .alert-success {
-            animation: slideIn 0.5s forwards;
+            text-align: left;
+            border-radius: var(--border-radius);
+            margin-top: 1.5rem;
+            animation: slideUp 0.5s ease-out;
+        }
+        .alert-success a {
+            font-weight: 700;
         }
 
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(20px); }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
+        }
+
+        .footer-text {
+            margin-top: 2rem;
+            font-size: 0.9rem;
+            color: var(--light-text-color);
         }
     </style>
 </head>
 <body>
-    <div class="container" style="max-width: 600px;">
-        <div class="card">
-            <div class="card-header text-center bg-white border-0 pt-4">
-                <h1>Shorter.ly</h1>
-        
+    <main class="main-container">
+        <div class="hero-section">
+            <h1>QuickLink</h1>
+            <p>The simplest way to shorten, share, and track your links.</p>
+        </div>
+
+        <div class="form-card">
+            <form action="{{ route('shorten.url') }}" method="POST">
+                @csrf
+                <div class="input-group">
+                    <input
+                        type="url"
+                        name="original_url"
+                        class="form-control @error('original_url') is-invalid @enderror"
+                        placeholder="Paste your long URL here..."
+                        aria-label="Long URL"
+                        required
+                    >
+                    <button class="btn btn-primary" type="submit">Shorten</button>
+                </div>
+                @error('original_url')
+                    <div class="text-danger text-start mt-2">{{ $message }}</div>
+                @enderror
+            </form>
+
+            @if (session('success'))
+                <div class="alert alert-success" role="alert">{!! session('success') !!}</div>
+            @endif
+        </div>
+
+        <p class="footer-text">Built with Laravel & ❤️ for your internship showcase.</p>
+    </main>
+</body>
+</html>
